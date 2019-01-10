@@ -1,0 +1,102 @@
+﻿@{
+	ViewData["Title"] = "Home Page";
+}
+
+<div id="test-header">
+	<div class="header">
+		<h1 style="display:inline-block;">{{header.toLocaleUpperCase()}}</h1>
+		<button v-if="state === 'default'" v-on:click="changestate('edit')" class="btn btn-primary" style="vertical-align:text-bottom;margin-left:15px;">Add Item</button>
+		<button v-else class="btn btn-danger" v-on:click="changestate('default')" style="vertical-align:text-bottom;margin-left:15px;">Cancel</button>
+	</div>
+	<div v-if="state === 'edit'" class="add-item-form">
+		<input class="input-lg" v-model="newitem" style="width: 60%;" type="text" placeholder="What can you do with vue?" @@keyup.enter="submitline" />
+		<p style="display:inline-block;">{{characterCount}}/200</p>
+		<button class="btn btn-primary btn-lg" style="float: right;width: 20%;" v-bind:disabled="newitem.length === 0" v-on:click="submitline">Save</button>
+	</div>
+	<div style="width:49%;display:inline-block;">
+		<draggable v-model="list" :options="{group:'people'}" class="dragArea" style="background-color:aliceblue">
+			<div v-for="item in list" :class="[item.finished ? 'strikeout': '',item.highPriority ? 'highPriority': '']">{{item.name}}</div>
+			<div v-if="list.length === 0">
+				Drag something here your list is empty
+			</div>
+		</draggable>
+		
+	</div>
+	<div style="width:49%;display:inline-block;">
+		<draggable v-model="list2" :options="{group:'people'}" class="dragArea" style="background-color:aliceblue">
+			<div v-for="item in list2" :class="[item.finished ? 'strikeout': '',item.highPriority ? 'highPriority': '']">{{item.name}}</div>
+			<div v-if="list2.length === 0">
+				Drag something here your list is empty
+			</div>
+		</draggable>
+		
+	</div>
+</div>
+
+<div class="row">
+
+</div>
+
+<script src="~/js/lodash.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.14.1/vuedraggable.min.js"></script>
+
+<script>
+	new Vue({
+		el: '#test-header',
+		data: {
+			state: 'default',
+			header: 'I little test Vue Site',
+			newitem: '',
+			list: [{
+				name: "John", finished: true, highPriority: true,
+			}, {
+					name: "Joao", finished: false, highPriority: false,
+			}, {
+					name: "Jean", finished: true, highPriority: false,
+			}],
+			list2: [{
+				name: "Juan", finished: true, highPriority: false,
+			}, {
+					name: "Edgard", finished: true, highPriority: true,
+			}, {
+					name: "Johnson", finished: false, highPriority: false,
+			}]
+		},
+		computed: {
+			characterCount() {
+				return this.newitem.length;
+			},
+			sorteddata() {
+				return _.orderBy(this.list, 'name');
+			},
+		},
+		methods: {
+			submitline: function () {
+				this.list.push({ name: this.newitem, finished: false, highPriority: true, });
+				this.list2.push({ name: this.newitem, finished: true, highPriority: false, });
+				this.newitem = '';
+			},
+			changestate: function (newState) {
+				this.state = newState;
+				this.newitem = '';
+			},
+			togglefinished: function (item) {
+				item.finished = !item.finished;
+			}
+		}
+	});
+
+	//function sortList(c1, c2) {
+	//	if (c1.label < c2.label) {
+	//		return -1;
+	//	}
+	//	else if (c1.label === c2.label) {
+	//		return 0;
+	//	}
+	//	else if (c1.label > c2.label) {
+	//		return 1;
+	//	}
+	//}
+</script>
